@@ -37,9 +37,9 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
     this.valorFinal = 1;
 
     // Cargo el valor deMedida
-    this.deMedida = Medidas.medidasLongitud[this.valorInicial];
+    this.deMedida = Longitud.medidasLongitud[this.valorInicial];
     // Cargo el valor aMedida
-    this.aMedida = Medidas.medidasLongitud[this.valorFinal];
+    this.aMedida = Longitud.medidasLongitud[this.valorFinal];
 
     super.initState();
   }
@@ -74,7 +74,13 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
                   hint: 'Introduce valor a convertir',
                   icono: Icons.keyboard_alt_outlined,
                   nomostrar: false,
+                  // Seleccionamos teclado numerico para que se introduzca numero
                   teclado: TextInputType.number,
+                  // Enviamos expresion regular que permite números enteros y decimales
+                  // Un dígito en el intervalo 1-9 seguido de cero o más otros dígitos
+                  // y opcionalmente, seguido de un punto decimal seguido de al menos 1 dígito:
+                  //formato:
+                  //[FilteringTextInputFormatter.allow(RegExp(r'^[1-9]\d*(\.\d+)?$'))]
                 ),
                 // Añadimos Padding entre caja de Texto y Texto De
                 Padding(
@@ -87,13 +93,13 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
                 DropdownButton<String>(
                     isExpanded: true,
                     value: deMedida,
-                    items: Medidas.medidasLongitud.map((valor) {
+                    items: Longitud.medidasLongitud.map((elemento) {
                       return DropdownMenuItem(
-                          value: valor,
+                          value: elemento,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              valor,
+                              elemento,
                               style: Estilos.estiloMedida,
                             ),
                           ));
@@ -101,7 +107,7 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
                     onChanged: (value) {
                       setState(() {
                         deMedida = value!;
-                        valorInicial = Medidas.medidasLongitud.indexOf(deMedida);
+                        valorInicial = Longitud.medidasLongitud.indexOf(deMedida);
                       });
                     }),
                 SizedBox(
@@ -111,24 +117,27 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
                 SizedBox(
                   height: 8,
                 ),
+                // Definimos el DropdownButton de tipo String
                 DropdownButton<String>(
                     value: aMedida,
                     isExpanded: true,
-                    items: Medidas.medidasLongitud.map((m) {
+                    items: Longitud.medidasLongitud.map((elemento) {
                       return DropdownMenuItem(
-                          value: m,
+                          value: elemento,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              m,
+                              elemento,
                               style: Estilos.estiloMedida,
                             ),
                           ));
+                    // Pasamos a Tolist porque el items espera una lista
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
+                        // Decimos con ! que value siempre va a tener un valor
                         aMedida = value!;
-                        valorFinal = Medidas.medidasLongitud.indexOf(aMedida);
+                        valorFinal = Longitud.medidasLongitud.indexOf(aMedida);
                       });
                     }),
                 SizedBox(
@@ -164,17 +173,19 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
                           top: 30, left: 10, right: 10),
                       child: BotonIconoAnimado(
                         accion: () {
+                          // lo ponemos en un try por si hubo algun error
                           try {
                             // obtenemos el valor del usuario
                             final value = double.parse(valorController.text.trim());
                             setState(() {
                               // aplicamos los calculos
-                              this.valorResultado = "${value * Formulas.parametrosFormulas[valorInicial][valorFinal]}";
+                              this.valorResultado = "${value * Longitud.factorConversionLongitud[valorInicial][valorFinal]}";
                             });
                             // ocultar teclado
                             FocusScope.of(context).requestFocus(FocusNode());
                           } catch (e) {
-                            print("Problemas con la conversión");
+                            mensaje(context, "Problemas con la conversión");
+                            //print("Problemas con la conversión");
                           }
                         },
                         icono: Icons.search,
@@ -183,12 +194,11 @@ import 'package:convertidor_medidas/ui/utils/utils.dart';
                     ),
                   ],
                 ),
+                // Si ponemos Spacer lo lleva al final del todo da problemas con scrool
                 //Spacer(),
-
                 SizedBox(
                   height: 20,
                 ),
-
                 Text("res: $valorResultado", style: Estilos.estiloLabel),
               ],
             ),

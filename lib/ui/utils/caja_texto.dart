@@ -13,6 +13,7 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CajaTexto extends StatelessWidget {
   final TextEditingController controller;
@@ -21,6 +22,7 @@ class CajaTexto extends StatelessWidget {
   final String? helper;
   final IconData? icono;
   final TextInputType? teclado;
+  final List<TextInputFormatter>? formato;
   final bool nomostrar;
 
   const CajaTexto({
@@ -31,6 +33,7 @@ class CajaTexto extends StatelessWidget {
     this.helper,
     this.icono,
     this.teclado,
+    this.formato,
     // Por defecto se muestra
     this.nomostrar = false,
   }) : super(key: key);
@@ -41,6 +44,8 @@ class CajaTexto extends StatelessWidget {
       controller: controller,
       obscureText: nomostrar,
       keyboardType: teclado,
+      // Si es distinto de nulo se pasa el formato dado que no es obligatorio
+      inputFormatters: formato != null ? formato : null,
       decoration: InputDecoration(
         // Condicionamos si se ha mandado el prefixIcon o no
           prefixIcon: icono == null ? null : Icon(icono),

@@ -1,44 +1,45 @@
 /*
-Clase Pantalla de conversion de pesos
+Clase Pantalla de conversiones de Tiempo
 */
 
 import 'package:flutter/material.dart';
 
-// Importamos Modelos
+// Importamos Pantallas para llamadas
 import 'package:convertidor_medidas/models/models.dart';
 // Importamos Widgets
 import 'package:convertidor_medidas/ui/widgets/widgets.dart';
 // Importamos Utilidades
 import 'package:convertidor_medidas/ui/utils/utils.dart';
-import 'package:flutter/services.dart';
 
-
-  class ConversionPesos extends StatefulWidget {
-  const ConversionPesos({Key? key}) : super(key: key);
+  class ConversionTiempo extends StatefulWidget {
+  const ConversionTiempo({Key? key}) : super(key: key);
 
   @override
-  ConversionPesosState createState() => ConversionPesosState();
+  ConversionTiempoState createState() => ConversionTiempoState();
   }
 
-  class ConversionPesosState extends State<ConversionPesos> {
+  class ConversionTiempoState extends State<ConversionTiempo> {
 
-    late String deMedida;
-    late String aMedida;
+  // Valores conversion De A
+  late String deMedida;
+  late String aMedida;
 
-    String valorResultado = "0";
+  String valorResultado = "0";
 
-    late int valorInicial;
-    late int valorFinal;
+  late int valorInicial;
+  late int valorFinal;
 
-    final valorController = TextEditingController();
+  final valorController = TextEditingController();
 
   @override
   void initState() {
     this.valorInicial = 0;
     this.valorFinal = 1;
 
-    this.deMedida = Peso.medidasPeso[this.valorInicial];
-    this.aMedida = Peso.medidasPeso[this.valorFinal];
+    // Cargo el valor deMedida
+    this.deMedida = Tiempo.medidasTiempo[this.valorInicial];
+    // Cargo el valor aMedida
+    this.aMedida = Tiempo.medidasTiempo[this.valorFinal];
 
     super.initState();
   }
@@ -47,13 +48,13 @@ import 'package:flutter/services.dart';
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Conversión de Pesos"),
+          title: Text("Conversión de Tiempo"),
           // Añadimos Boton para volver a menu anterior
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
               onPressed: () {
                 Navigator.pop(context);
-            }
+              }
           )
         ),
         // Añadimos Menu Lateral
@@ -92,7 +93,7 @@ import 'package:flutter/services.dart';
                 DropdownButton<String>(
                     isExpanded: true,
                     value: deMedida,
-                    items: Peso.medidasPeso.map((elemento) {
+                    items: Tiempo.medidasTiempo.map((elemento) {
                       return DropdownMenuItem(
                           value: elemento,
                           child: Padding(
@@ -106,7 +107,7 @@ import 'package:flutter/services.dart';
                     onChanged: (value) {
                       setState(() {
                         deMedida = value!;
-                        valorInicial = Peso.medidasPeso.indexOf(deMedida);
+                        valorInicial = Tiempo.medidasTiempo.indexOf(deMedida);
                       });
                     }),
                 SizedBox(
@@ -116,10 +117,11 @@ import 'package:flutter/services.dart';
                 SizedBox(
                   height: 8,
                 ),
+                // Definimos el DropdownButton de tipo String
                 DropdownButton<String>(
                     value: aMedida,
                     isExpanded: true,
-                    items: Peso.medidasPeso.map((elemento) {
+                    items: Tiempo.medidasTiempo.map((elemento) {
                       return DropdownMenuItem(
                           value: elemento,
                           child: Padding(
@@ -129,11 +131,13 @@ import 'package:flutter/services.dart';
                               style: Estilos.estiloMedida,
                             ),
                           ));
+                    // Pasamos a Tolist porque el items espera una lista
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
+                        // Decimos con ! que value siempre va a tener un valor
                         aMedida = value!;
-                        valorFinal = Peso.medidasPeso.indexOf(aMedida);
+                        valorFinal = Tiempo.medidasTiempo.indexOf(aMedida);
                       });
                     }),
                 SizedBox(
@@ -169,12 +173,13 @@ import 'package:flutter/services.dart';
                           top: 30, left: 10, right: 10),
                       child: BotonIconoAnimado(
                         accion: () {
+                          // lo ponemos en un try por si hubo algun error
                           try {
                             // obtenemos el valor del usuario
                             final value = double.parse(valorController.text.trim());
                             setState(() {
                               // aplicamos los calculos
-                              this.valorResultado = "${value * Peso.factorConversionPeso[valorInicial][valorFinal]}";
+                              this.valorResultado = "${value * Tiempo.factorConversionTiempo[valorInicial][valorFinal]}";
                             });
                             // ocultar teclado
                             FocusScope.of(context).requestFocus(FocusNode());
@@ -189,12 +194,11 @@ import 'package:flutter/services.dart';
                     ),
                   ],
                 ),
+                // Si ponemos Spacer lo lleva al final del todo da problemas con scrool
                 //Spacer(),
-
                 SizedBox(
                   height: 20,
                 ),
-
                 Text("res: $valorResultado", style: Estilos.estiloLabel),
               ],
             ),
@@ -202,5 +206,4 @@ import 'package:flutter/services.dart';
         ),
     );
   }
-
 }

@@ -1,44 +1,45 @@
 /*
-Clase Pantalla de conversion de pesos
+Clase Pantalla de conversiones de Temperaturas
 */
 
 import 'package:flutter/material.dart';
 
-// Importamos Modelos
+// Importamos Pantallas para llamadas
 import 'package:convertidor_medidas/models/models.dart';
 // Importamos Widgets
 import 'package:convertidor_medidas/ui/widgets/widgets.dart';
 // Importamos Utilidades
 import 'package:convertidor_medidas/ui/utils/utils.dart';
-import 'package:flutter/services.dart';
 
-
-  class ConversionPesos extends StatefulWidget {
-  const ConversionPesos({Key? key}) : super(key: key);
+  class ConversionTemperatura extends StatefulWidget {
+  const ConversionTemperatura({Key? key}) : super(key: key);
 
   @override
-  ConversionPesosState createState() => ConversionPesosState();
+  ConversionTemperaturaState createState() => ConversionTemperaturaState();
   }
 
-  class ConversionPesosState extends State<ConversionPesos> {
+  class ConversionTemperaturaState extends State<ConversionTemperatura> {
 
-    late String deMedida;
-    late String aMedida;
+  // Valores conversion De A
+  late String deMedida;
+  late String aMedida;
 
-    String valorResultado = "0";
+  String valorResultado = "0";
 
-    late int valorInicial;
-    late int valorFinal;
+  late int valorInicial;
+  late int valorFinal;
 
-    final valorController = TextEditingController();
+  final valorController = TextEditingController();
 
   @override
   void initState() {
     this.valorInicial = 0;
     this.valorFinal = 1;
 
-    this.deMedida = Peso.medidasPeso[this.valorInicial];
-    this.aMedida = Peso.medidasPeso[this.valorFinal];
+    // Cargo el valor deMedida
+    this.deMedida = Temperatura.medidasTemperatura[this.valorInicial];
+    // Cargo el valor aMedida
+    this.aMedida = Temperatura.medidasTemperatura[this.valorFinal];
 
     super.initState();
   }
@@ -47,13 +48,13 @@ import 'package:flutter/services.dart';
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Conversión de Pesos"),
+          title: Text("Conversión de Temperatura"),
           // Añadimos Boton para volver a menu anterior
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios),
               onPressed: () {
                 Navigator.pop(context);
-            }
+              }
           )
         ),
         // Añadimos Menu Lateral
@@ -92,7 +93,7 @@ import 'package:flutter/services.dart';
                 DropdownButton<String>(
                     isExpanded: true,
                     value: deMedida,
-                    items: Peso.medidasPeso.map((elemento) {
+                    items: Temperatura.medidasTemperatura.map((elemento) {
                       return DropdownMenuItem(
                           value: elemento,
                           child: Padding(
@@ -106,7 +107,7 @@ import 'package:flutter/services.dart';
                     onChanged: (value) {
                       setState(() {
                         deMedida = value!;
-                        valorInicial = Peso.medidasPeso.indexOf(deMedida);
+                        valorInicial = Temperatura.medidasTemperatura.indexOf(deMedida);
                       });
                     }),
                 SizedBox(
@@ -116,10 +117,11 @@ import 'package:flutter/services.dart';
                 SizedBox(
                   height: 8,
                 ),
+                // Definimos el DropdownButton de tipo String
                 DropdownButton<String>(
                     value: aMedida,
                     isExpanded: true,
-                    items: Peso.medidasPeso.map((elemento) {
+                    items: Temperatura.medidasTemperatura.map((elemento) {
                       return DropdownMenuItem(
                           value: elemento,
                           child: Padding(
@@ -129,11 +131,13 @@ import 'package:flutter/services.dart';
                               style: Estilos.estiloMedida,
                             ),
                           ));
+                    // Pasamos a Tolist porque el items espera una lista
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
+                        // Decimos con ! que value siempre va a tener un valor
                         aMedida = value!;
-                        valorFinal = Peso.medidasPeso.indexOf(aMedida);
+                        valorFinal = Temperatura.medidasTemperatura.indexOf(aMedida);
                       });
                     }),
                 SizedBox(
@@ -169,12 +173,13 @@ import 'package:flutter/services.dart';
                           top: 30, left: 10, right: 10),
                       child: BotonIconoAnimado(
                         accion: () {
+                          // lo ponemos en un try por si hubo algun error
                           try {
                             // obtenemos el valor del usuario
                             final value = double.parse(valorController.text.trim());
                             setState(() {
-                              // aplicamos los calculos
-                              this.valorResultado = "${value * Peso.factorConversionPeso[valorInicial][valorFinal]}";
+                              // Llamamos a funcion calculo enviando el valor
+                              calculoTemperatura(value);
                             });
                             // ocultar teclado
                             FocusScope.of(context).requestFocus(FocusNode());
@@ -189,12 +194,11 @@ import 'package:flutter/services.dart';
                     ),
                   ],
                 ),
+                // Si ponemos Spacer lo lleva al final del todo da problemas con scrool
                 //Spacer(),
-
                 SizedBox(
                   height: 20,
                 ),
-
                 Text("res: $valorResultado", style: Estilos.estiloLabel),
               ],
             ),
@@ -203,4 +207,33 @@ import 'package:flutter/services.dart';
     );
   }
 
+  // Funcion para calculo de temperatura según valores seleccionados
+  void calculoTemperatura(double value) {
+    // Instanciamos objeto clase temperatura para poder acceder a sus metodos
+    Temperatura t = new Temperatura();
+    // Si se ha elegido de Celsius a Fahrenheit
+    if (valorInicial == 0 && valorFinal == 1) {
+      this.valorResultado = t.celsiusFarenheit(value).toString();
+    }
+    // Si se ha elegido de Celsius a Kelvin
+    if (valorInicial == 0 && valorFinal == 2){
+      this.valorResultado = t.celsiusKelvin(value).toString();;
+    }
+    // Si se ha elegido de Farenheit a Celsius
+    if (valorInicial == 1 && valorFinal == 0){
+      this.valorResultado = t.farenheitCelsius(value).toString();;
+    }
+    // Si se ha elegido de Farenheit a Kelvin
+    if (valorInicial == 1 && valorFinal == 2){
+      this.valorResultado = t.farenheitKelvin(value).toString();;
+    }
+    // Si se ha elegido de Kelvin a Celsius
+    if (valorInicial == 2 && valorFinal == 0){
+      this.valorResultado = t.kelvinCelsius(value).toString();;
+    }
+    // Si se ha elegido de Kelvin a Farenheit
+    if (valorInicial == 2 && valorFinal == 0){
+      this.valorResultado = t.kelvinFarenheit(value).toString();;
+    }
+  }
 }
